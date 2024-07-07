@@ -12,8 +12,8 @@ function initialize() {
     currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (currentUser && currentUser.isAdmin) {
         displayAdminInterface(); // Отображаем административную панель для администратора
+        displayBooks(); // Отображаем книги для всех пользователей
     } else {
-        displayUserInterface(); // Отображаем пользовательский интерфейс для обычных пользователей
         displayBooks(); // Отображаем книги для всех пользователей
     }
 }
@@ -21,13 +21,6 @@ function initialize() {
 // Функция отображения интерфейса администратора
 function displayAdminInterface() {
     document.getElementById('adminPanel').style.display = 'block';
-    document.getElementById('userPanel').style.display = 'none';
-}
-
-// Функция отображения интерфейса пользователя
-function displayUserInterface() {
-    document.getElementById('adminPanel').style.display = 'none';
-    document.getElementById('userPanel').style.display = 'block';
 }
 
 // Функция отображения всех книг
