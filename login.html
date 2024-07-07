@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <header>
         <h1>Login</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="register.html">Register</a>
+        </nav>
     </header>
     <main>
         <form id="loginForm">
@@ -16,6 +20,9 @@
             <button type="submit">Login</button>
         </form>
     </main>
-    <script src="script.js"></script>
+    <script src="js/scripts.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', loginUser);
+    </script>
 </body>
 </html>
