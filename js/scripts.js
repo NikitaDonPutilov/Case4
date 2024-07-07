@@ -6,9 +6,10 @@ function initialize() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (currentUser && currentUser.isAdmin) {
         displayAdminInterface();
-        displayBooks(); // Отображаем список книг
+        displayBooks(); // Отображаем список книг для администратора
     } else {
         displayUserInterface();
+        displayBooks(); // Отображаем список книг для пользователя
     }
 }
 
@@ -25,9 +26,10 @@ function displayBooks() {
             <p><strong>Year:</strong> ${book.year}</p>
             <p><strong>Price:</strong> $${book.price}</p>
             ${book.available ? '<p>Status: Available</p>' : '<p>Status: Not available</p>'}
-            <button onclick="viewBook(${book.id})">View Details</button>
-            <button onclick="editBook(${book.id})">Edit</button>
-            <button onclick="deleteBook(${book.id})">Delete</button>
+            ${currentUser.isAdmin ? `
+                <button onclick="viewBook(${book.id})">View Details</button>
+                <button onclick="editBook(${book.id})">Edit</button>
+                <button onclick="deleteBook(${book.id})">Delete</button>` : ''}
         `;
         booksDiv.appendChild(bookDiv);
     });
@@ -107,4 +109,63 @@ function displayAdminInterface() {
 function displayUserInterface() {
     document.getElementById('adminPanel').style.display = 'none';
     document.getElementById('userPanel').style.display = 'block';
+}
+
+// Добавление новой книги (для администратора)
+function addBook(event) {
+    event.preventDefault();
+    const title = document.getElementById('title').value;
+    const author = document.getElementById('author').value;
+    const year = parseInt(document.getElementById('year').value);
+    const price = parseFloat(document.getElementById('price').value);
+
+    const newBook = {
+        id: books.length + 1,
+        title: title,
+        author: author,
+        year: year,
+        price: price,
+        available: true
+    };
+
+    books.push(newBook);
+    alert('Book added successfully');
+    localStorage.setItem('books', JSON.stringify(books));
+    window.location.href = 'admin.html';
+}
+
+// Функция для регистрации пользователя
+function registerUser(event) {
+    event.preventDefault();
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    if (users.some(user => user.username === username)) {
+        alert('Username already exists');
+        return;
+    }
+
+    users.push({ username, email, password, isAdmin: false });
+    localStorage.setItem('users', JSON.stringify(users));
+    alert('Registration successful');
+    window.location.href = 'login.html';
+}
+
+// Функция для авторизации пользователя
+function loginUser(event) {
+    event.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const foundUser = users.find(user => user.username === username && user.password === password);
+    if (foundUser) {
+        localStorage.setItem('currentUser', JSON.stringify({ username: foundUser.username, isAdmin: foundUser.isAdmin }));
+        alert('Login successful');
+        window.location.href = 'index.html'; // Перенаправляем на главную страницу
+    } else {
+        alert('Invalid username or password');
+    }
 }
