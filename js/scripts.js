@@ -1,3 +1,5 @@
+let currentUser;
+
 // Модель данных для книг
 let books = JSON.parse(localStorage.getItem('books')) || [
     { id: 1, title: 'Book 1', author: 'Author 1', year: 2020, price: 20.5, available: true },
@@ -7,7 +9,7 @@ let books = JSON.parse(localStorage.getItem('books')) || [
 
 // Инициализация страницы
 function initialize() {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (currentUser && currentUser.isAdmin) {
         window.location.href = 'admin.html'; // Перенаправляем администратора на админ-панель
     } else {
