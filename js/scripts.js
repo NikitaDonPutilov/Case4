@@ -117,18 +117,6 @@ function logoutUser() {
     window.location.href = 'login.html';
 }
 
-// Функция отображения интерфейса администратора
-function displayAdminInterface() {
-    document.getElementById('adminPanel').style.display = 'block';
-    document.getElementById('userPanel').style.display = 'none';
-}
-
-// Функция отображения интерфейса пользователя
-function displayUserInterface() {
-    document.getElementById('adminPanel').style.display = 'none';
-    document.getElementById('userPanel').style.display = 'block';
-}
-
 // Добавление новой книги (для администратора)
 function addBook(event) {
     event.preventDefault();
@@ -181,7 +169,7 @@ function loginUser(event) {
     const foundUser = users.find(user => user.username === username && user.password === password);
     
     if (foundUser) {
-        const isAdmin = foundUser.username === 'admin' && foundUser.password == 'admin'; // Устанавливаем isAdmin в зависимости от имени пользователя
+        const isAdmin = foundUser.username === 'admin' && foundUser.password === 'admin'; // Проверяем и логин, и пароль
         localStorage.setItem('currentUser', JSON.stringify({ username: foundUser.username, isAdmin: isAdmin }));
         alert('Login successful');
         window.location.href = 'index.html'; // Перенаправляем на главную страницу
