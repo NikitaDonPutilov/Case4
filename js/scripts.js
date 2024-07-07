@@ -9,10 +9,9 @@ let books = JSON.parse(localStorage.getItem('books')) || [
 function initialize() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (currentUser && currentUser.isAdmin) {
-        displayAdminInterface();
-        displayBooks(); // Отображаем список книг
+        window.location.href = 'admin.html'; // Перенаправляем администратора на админ-панель
     } else {
-        displayUserInterface();
+        displayBooks(); // Отображаем книги для всех пользователей
     }
 }
 
