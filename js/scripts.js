@@ -1,27 +1,9 @@
-let currentUser;
-
 // Модель данных для книг
-let books = JSON.parse(localStorage.getItem('books')) || [
+let books = [
     { id: 1, title: 'Book 1', author: 'Author 1', year: 2020, price: 20.5, available: true },
     { id: 2, title: 'Book 2', author: 'Author 2', year: 2018, price: 15.75, available: true },
     { id: 3, title: 'Book 3', author: 'Author 3', year: 2015, price: 30, available: false }
 ];
-
-// Инициализация страницы
-function initialize() {
-    currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (currentUser && currentUser.isAdmin) {
-        displayAdminInterface(); // Отображаем административную панель для администратора
-        displayBooks(); // Отображаем книги для всех пользователей
-    } else {
-        displayBooks(); // Отображаем книги для всех пользователей
-    }
-}
-
-// Функция отображения интерфейса администратора
-function displayAdminInterface() {
-    document.getElementById('adminPanel').style.display = 'block';
-}
 
 // Функция отображения всех книг
 function displayBooks() {
@@ -37,10 +19,6 @@ function displayBooks() {
             <p><strong>Price:</strong> $${book.price}</p>
             ${book.available ? '<p>Status: Available</p>' : '<p>Status: Not available</p>'}
             <button onclick="viewBook(${book.id})">View Details</button>
-            ${currentUser && currentUser.isAdmin ? `
-                <button onclick="editBook(${book.id})">Edit</button>
-                <button onclick="deleteBook(${book.id})">Delete</button>
-            ` : ''}
         `;
         booksDiv.appendChild(bookDiv);
     });
@@ -57,60 +35,41 @@ function viewBook(bookId) {
     }
 }
 
-// Функция для удаления книги
-function deleteBook(bookId) {
-    const index = books.findIndex(book => book.id === bookId);
-    if (index !== -1) {
-        books.splice(index, 1);
-        localStorage.setItem('books', JSON.stringify(books));
-        displayBooks();
-        alert('Book deleted successfully');
+// Функция отображения деталей выбранной книги
+function displayBookDetails() {
+    const bookDetailsDiv = document.getElementById('bookDetails');
+    const currentBook = JSON.parse(localStorage.getItem('currentBook'));
+
+    if (currentBook) {
+        bookDetailsDiv.innerHTML = `
+            <h2>${currentBook.title}</h2>
+            <p><strong>Author:</strong> ${currentBook.author}</p>
+            <p><strong>Year:</strong> ${currentBook.year}</p>
+            <p><strong>Price:</strong> $${currentBook.price}</p>
+            ${currentBook.available ? '<p>Status: Available</p>' : '<p>Status: Not available</p>'}
+            <button onclick="buyOrRentBook(${currentBook.id})">Buy/Rent</button>
+        `;
     } else {
-        alert('Book not found');
+        bookDetailsDiv.innerHTML = '<p>Book details not available</p>';
     }
 }
 
-// Функция для редактирования книги
-function editBook(bookId) {
-    const book = books.find(book => book.id === bookId);
-    if (book) {
-        const newTitle = prompt('Enter new title (leave empty to keep current title):', book.title) || book.title;
-        const newAuthor = prompt('Enter new author (leave empty to keep current author):', book.author) || book.author;
-        const newYear = parseInt(prompt('Enter new year (leave empty to keep current year):', book.year)) || book.year;
-        const newPrice = parseFloat(prompt('Enter new price (leave empty to keep current price):', book.price)) || book.price;
-        const isAvailable = confirm('Is the book available?');
-
-        const editedBook = {
-            ...book,
-            title: newTitle,
-            author: newAuthor,
-            year: newYear,
-            price: newPrice,
-            available: isAvailable
-        };
-
-        const index = books.findIndex(book => book.id === bookId);
-        if (index !== -1) {
-            books.splice(index, 1, editedBook);
-            localStorage.setItem('books', JSON.stringify(books));
-            displayBooks();
-            alert('Book edited successfully');
+// Функция покупки или аренды книги
+function buyOrRentBook(bookId) {
+    const currentBook = books.find(book => book.id === bookId);
+    if (currentBook) {
+        const duration = prompt('Enter duration for rent (2 weeks, 1 month, 3 months):');
+        if (duration === '2 weeks' || duration === '1 month' || duration === '3 months') {
+            alert(`You have rented "${currentBook.title}" for ${duration}`);
         } else {
-            alert('Book not found');
+            alert('Invalid duration input');
         }
     } else {
         alert('Book not found');
     }
 }
 
-// Функция для выхода пользователя из системы
-function logoutUser() {
-    localStorage.removeItem('currentUser');
-    alert('Logged out successfully');
-    window.location.href = 'login.html';
-}
-
-// Добавление новой книги (для администратора)
+// Функция добавления новой книги (для администратора)
 function addBook(event) {
     event.preventDefault();
     const title = document.getElementById('title').value;
@@ -137,7 +96,6 @@ function addBook(event) {
 function registerUser(event) {
     event.preventDefault();
     const username = document.getElementById('username').value;
-    const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
     const users = JSON.parse(localStorage.getItem('users')) || [];
@@ -146,7 +104,7 @@ function registerUser(event) {
         return;
     }
 
-    users.push({ username, email, password, isAdmin: false });
+    users.push({ username, password, isAdmin: false });
     localStorage.setItem('users', JSON.stringify(users));
     alert('Registration successful');
     window.location.href = 'login.html';
@@ -159,14 +117,52 @@ function loginUser(event) {
     const password = document.getElementById('password').value;
 
     const users = JSON.parse(localStorage.getItem('users')) || [];
-    const foundUser = users.find(user => user.username === username && user.password === password);
-    
-    if (foundUser) {
-        const isAdmin = foundUser.username === 'admin' && foundUser.password === 'admin'; // Проверяем и логин, и пароль
-        localStorage.setItem('currentUser', JSON.stringify({ username: foundUser.username, isAdmin: isAdmin }));
-        alert('Login successful');
-        window.location.href = 'index.html'; // Перенаправляем на главную страницу
-    } else {
+    const user = users.find(user => user.username === username && user.password === password);
+
+    if (!user) {
         alert('Invalid username or password');
+        return;
+    }
+
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    alert('Login successful');
+    if (user.isAdmin) {
+        window.location.href = 'admin.html';
+    } else {
+        window.location.href = 'index.html';
     }
 }
+
+// Функция для выхода пользователя из системы
+function logoutUser() {
+    localStorage.removeItem('currentUser');
+    alert('Logged out successfully');
+    window.location.href = 'login.html';
+}
+
+// Инициализация страницы
+function initialize() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUser && currentUser.isAdmin) {
+        // Администратор авторизован
+        displayAdminInterface();
+    } else {
+        // Пользователь или администратор не авторизованы
+        displayUserInterface();
+    }
+}
+
+// Функция отображения интерфейса администратора
+function displayAdminInterface() {
+    document.getElementById('adminPanel').style.display = 'block';
+    document.getElementById('userPanel').style.display = 'none';
+}
+
+// Функция отображения интерфейса пользователя
+function displayUserInterface() {
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('userPanel').style.display = 'block';
+}
+
+// Инициализация при загрузке страницы
+initialize();
