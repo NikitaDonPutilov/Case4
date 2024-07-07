@@ -1,15 +1,18 @@
 // Модель данных для книг
-let books = JSON.parse(localStorage.getItem('books')) || [];
+let books = JSON.parse(localStorage.getItem('books')) || [
+    { id: 1, title: 'Book 1', author: 'Author 1', year: 2020, price: 20.5, available: true },
+    { id: 2, title: 'Book 2', author: 'Author 2', year: 2018, price: 15.75, available: true },
+    { id: 3, title: 'Book 3', author: 'Author 3', year: 2015, price: 30, available: false }
+];
 
 // Инициализация страницы
 function initialize() {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (currentUser && currentUser.isAdmin) {
         displayAdminInterface();
-        displayBooks(); // Отображаем список книг для администратора
+        displayBooks(); // Отображаем список книг
     } else {
         displayUserInterface();
-        displayBooks(); // Отображаем список книг для пользователя
     }
 }
 
@@ -26,10 +29,11 @@ function displayBooks() {
             <p><strong>Year:</strong> ${book.year}</p>
             <p><strong>Price:</strong> $${book.price}</p>
             ${book.available ? '<p>Status: Available</p>' : '<p>Status: Not available</p>'}
-            ${currentUser.isAdmin ? `
-                <button onclick="viewBook(${book.id})">View Details</button>
+            <button onclick="viewBook(${book.id})">View Details</button>
+            ${currentUser && currentUser.isAdmin ? `
                 <button onclick="editBook(${book.id})">Edit</button>
-                <button onclick="deleteBook(${book.id})">Delete</button>` : ''}
+                <button onclick="deleteBook(${book.id})">Delete</button>
+            ` : ''}
         `;
         booksDiv.appendChild(bookDiv);
     });
