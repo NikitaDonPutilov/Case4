@@ -11,10 +11,23 @@ let books = JSON.parse(localStorage.getItem('books')) || [
 function initialize() {
     currentUser = JSON.parse(localStorage.getItem('currentUser'));
     if (currentUser && currentUser.isAdmin) {
-        window.location.href = 'admin.html'; // Перенаправляем администратора на админ-панель
+        displayAdminInterface(); // Отображаем административную панель для администратора
     } else {
+        displayUserInterface(); // Отображаем пользовательский интерфейс для обычных пользователей
         displayBooks(); // Отображаем книги для всех пользователей
     }
+}
+
+// Функция отображения интерфейса администратора
+function displayAdminInterface() {
+    document.getElementById('adminPanel').style.display = 'block';
+    document.getElementById('userPanel').style.display = 'none';
+}
+
+// Функция отображения интерфейса пользователя
+function displayUserInterface() {
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('userPanel').style.display = 'block';
 }
 
 // Функция отображения всех книг
