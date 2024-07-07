@@ -96,6 +96,7 @@ function addBook(event) {
 function registerUser(event) {
     event.preventDefault();
     const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
     const users = JSON.parse(localStorage.getItem('users')) || [];
@@ -104,7 +105,7 @@ function registerUser(event) {
         return;
     }
 
-    users.push({ username, password, isAdmin: false });
+    users.push({ username, email, password, subscriptions: [] });
     localStorage.setItem('users', JSON.stringify(users));
     alert('Registration successful');
     window.location.href = 'login.html';
@@ -126,11 +127,7 @@ function loginUser(event) {
 
     localStorage.setItem('currentUser', JSON.stringify(user));
     alert('Login successful');
-    if (user.isAdmin) {
-        window.location.href = 'admin.html';
-    } else {
-        window.location.href = 'index.html';
-    }
+    window.location.href = 'index.html';
 }
 
 // Функция для выхода пользователя из системы
