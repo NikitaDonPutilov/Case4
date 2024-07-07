@@ -179,8 +179,10 @@ function loginUser(event) {
 
     const users = JSON.parse(localStorage.getItem('users')) || [];
     const foundUser = users.find(user => user.username === username && user.password === password);
+    
     if (foundUser) {
-        localStorage.setItem('currentUser', JSON.stringify({ username: foundUser.username, isAdmin: foundUser.isAdmin }));
+        const isAdmin = foundUser.username === 'admin' && foundUser.password == 'admin'; // Устанавливаем isAdmin в зависимости от имени пользователя
+        localStorage.setItem('currentUser', JSON.stringify({ username: foundUser.username, isAdmin: isAdmin }));
         alert('Login successful');
         window.location.href = 'index.html'; // Перенаправляем на главную страницу
     } else {
